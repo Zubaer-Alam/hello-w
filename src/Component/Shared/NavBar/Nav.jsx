@@ -6,7 +6,7 @@ import {
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import logo from "../../../assets/logo.png";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function NavList() {
   return (
@@ -21,7 +21,7 @@ function NavList() {
           href="#"
           className="flex items-center uppercase font-bold text-white hover:text-blue-500 transition-colors"
         >
-          Pages
+          home
         </a>
       </Typography>
       <Typography
@@ -34,7 +34,7 @@ function NavList() {
           href="#"
           className="flex items-center uppercase font-bold text-white hover:text-blue-500 transition-colors"
         >
-          Account
+          Telegram
         </a>
       </Typography>
       <Typography
@@ -47,20 +47,7 @@ function NavList() {
           href="#"
           className="flex items-center uppercase font-bold text-white hover:text-blue-500 transition-colors"
         >
-          Blocks
-        </a>
-      </Typography>
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="p-1 font-medium"
-      >
-        <a
-          href="#"
-          className="flex items-center uppercase font-bold text-white hover:text-blue-500 transition-colors"
-        >
-          Docs
+          Log in
         </a>
       </Typography>
     </ul>
@@ -69,44 +56,51 @@ function NavList() {
 
 export function Nav() {
   const [openNav, setOpenNav] = useState(false);
+  const navRef = useRef(null);
 
   const handleWindowResize = () =>
     window.innerWidth >= 960 && setOpenNav(false);
 
+  const handleDocumentClick = (e) => {
+    if (navRef.current && !navRef.current.contains(e.target)) {
+      setOpenNav(false);
+    }
+  };
+
   useEffect(() => {
     window.addEventListener("resize", handleWindowResize);
+    document.addEventListener("click", handleDocumentClick);
 
     return () => {
       window.removeEventListener("resize", handleWindowResize);
+      document.removeEventListener("click", handleDocumentClick);
     };
   }, []);
 
   return (
-    <Navbar className="mx-auto border-none max-w-screen-xl px-6 py-3 bg-[#124063] rounded-none">
+    <Navbar
+      ref={navRef} // Ref for the navigation bar element
+      className="mx-auto fixed lg:relative z-10 border-none max-w-screen-xl px-6 py-3 bg-[#124063] rounded-none"
+    >
       <div className="flex items-center justify-between  text-white">
-        <Typography
-          as="a"
-          href="#"
-          variant="h6"
-          className="mr-4 cursor-pointer py-1.5"
-        >
-          {/* <img src={logo} alt="" /> */} logo
+        <Typography href="#" className="mr-4 cursor-pointer py-1.5">
+          <img className="h-5" src={logo} alt="" />
         </Typography>
         <div className="hidden lg:block">
           <NavList />
         </div>
-        <IconButton
-          variant="text"
-          className="ml-auto  h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
-          ripple={false}
-          onClick={() => setOpenNav(!openNav)}
-        >
+        <div className="flex relative lg:hidden">
           {openNav ? (
-            <XMarkIcon className="h-6 w-6" strokeWidth={2} />
+            <XMarkIcon className="h-6  w-6" strokeWidth={2} />
           ) : (
-            <Bars3Icon className="h-6 w-6" strokeWidth={2} />
+            <Bars3Icon className="h-6  w-6" strokeWidth={2} />
           )}
-        </IconButton>
+          <IconButton
+            className="ml-auto absolute bg-transparent  h-6 w-6 text-inherit"
+            ripple={false}
+            onClick={() => setOpenNav(!openNav)}
+          ></IconButton>
+        </div>
       </div>
       <Collapse open={openNav}>
         <NavList />
